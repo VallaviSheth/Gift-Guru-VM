@@ -56,12 +56,31 @@ def get_amazon_links(query):
     organic_results = results["organic_results"]
     for result in organic_results:
         st.image(result['thumbnail'])
-        st.write(f" {result['title']}")
+        st.write(f"{result['title']}")
         st.markdown(f"[{result['link']}]({result['link']})")
 
 def image_input(uploaded_file):
     image = Image.open(uploaded_file)
-    st.image(image, caption='Uploaded Image.', use_column_width=True)
+    params = {
+        "engine": "google_reverse_image",
+        "image_url": "https://cdn10.bigcommerce.com/s-f7f6vece63/products/4292/images/10077/61w7p56ZZwL._AC_SL1000___31345.1595441060.1280.1280.jpg?c=2",
+        "api_key": os.environ['GOOGLE_SERP_API_KEY'],
+        "q": 'Amazon'
+    }
+    search = GoogleSearch(params)
+    results = search.get_dict()
+    if 'inline_images' in results:
+        inline_images = results['inline_images']
+        for image in inline_images:
+            source_link = image['source']
+            original_image = image['original']
+            title = image['title']
+            st.write(f"### {title}")
+            st.image(original_image, use_column_width=True)
+            st.markdown(f"GET THIS GIFT FROM HERE: [{source_link}]({source_link})")
+    else:
+        st.write('# NO RESULTS FOUND')
+    st.image(image, caption='Your Uploaded Image.', use_column_width=True)
 
 def main():
     st.title("GiftGuru")
@@ -69,8 +88,9 @@ def main():
 
     # Placeholder for user prompt
     user_prompt = st.text_input("Enter your prompt here:")
-    res = gift_recommendation(user_prompt)
-    if user_prompt:
+    print('USER PROMPT:', user_prompt)
+    if len(user_prompt)>0:
+        res = gift_recommendation(user_prompt)
         # Display recommended gifts and reasons
         display_gift_cards(res)
 

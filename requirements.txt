@@ -3,3 +3,4 @@ langchain
 langchain-openai
 google-search-results
 openai
+python-dotenv
